@@ -220,7 +220,7 @@ async function handleHintClick() {
         console.log("ERROR:", error);
         output.innerText = "⚠️ Backend error / timeout";
     }
-}ß
+}
 
 // ==========================
 // 🎨 STYLES

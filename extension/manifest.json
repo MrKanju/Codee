@@ -2,9 +2,9 @@
   "manifest_version": 3,
   "name": "AI LeetCode Assistant",
   "version": "1.0",
-  "description": "Adaptive hint system for coding problems",
+  "description": "Adaptive hint system",
   "permissions": ["activeTab", "scripting"],
-  "host_permissions": ["https://leetcode.com/*"],
+  "host_permissions": ["http://127.0.0.1:8000/*"],
   "content_scripts": [
     {
       "matches": ["https://leetcode.com/problems/*"],

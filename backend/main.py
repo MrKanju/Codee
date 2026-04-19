@@ -78,7 +78,7 @@ def get_hint(req: Request, request: FastAPIRequest):
             entry = cache[cache_key]
             if time.time() - entry["time"] < CACHE_TTL:
                 print("CACHE HIT")
-                return {"hint": entry["value"]}
+                return entry["value"]
             else:
                 del cache[cache_key]
 
@@ -137,11 +137,17 @@ except:
         # 💾 SAVE CACHE
         # ==========================
         cache[cache_key] = {
-            "value": hint,
+            "value": {
+    "hint": hint,
+    "next_step": next_step
+}
             "time": time.time()
         }
 
-        return {"hint": hint}
+        return {
+    "hint": hint,
+    "next_step": next_step
+}
 
     except Exception as e:
         import traceback
@@ -149,6 +155,19 @@ except:
         traceback.print_exc()
         return {"hint": f"Error: {str(e)}"}
 import uvicorn
+import re
+
+text = response.candidates[0].content.parts[0].text
+
+json_match = re.search(r'\{.*\}', text, re.DOTALL)
+
+if json_match:
+    parsed = json.loads(json_match.group())
+    hint = parsed.get("hint", "")
+    next_step = parsed.get("next_step", "")
+else:
+    hint = text
+    next_step = "Think about the next logical step."
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000)
