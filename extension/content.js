@@ -192,7 +192,7 @@ async function handleHintClick() {
         document.getElementById("hint-output").innerText = "Thinking...";
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/hint", {
+            const response = await fetch("https://codee-backend-nhux.onrender.com/hint", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
