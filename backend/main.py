@@ -58,14 +58,16 @@ def get_hint(req: Request, request: FastAPIRequest):
         if user_ip not in rate_limit:
             rate_limit[user_ip] = []
 
-        # remove old timestamps
         rate_limit[user_ip] = [
             t for t in rate_limit[user_ip]
             if current_time - t < TIME_WINDOW
         ]
 
         if len(rate_limit[user_ip]) >= REQUEST_LIMIT:
-            return {"hint": "Too many requests. Please wait."}
+            return {
+                "hint": "Too many requests. Please wait.",
+                "next_step": ""
+            }
 
         rate_limit[user_ip].append(current_time)
 
@@ -104,7 +106,7 @@ Rules:
 - Keep it short
 
 IMPORTANT:
-Return response in this EXACT JSON format:
+Return ONLY valid JSON.
 
 {{
   "hint": "...",
@@ -120,54 +122,56 @@ Return response in this EXACT JSON format:
             contents=prompt
         )
 
+        # ==========================
+        # 🧠 PARSE RESPONSE
+        # ==========================
         import json
+        import re
 
-try:
-    text = response.candidates[0].content.parts[0].text
-    parsed = json.loads(text)
+        raw_text = response.candidates[0].content.parts[0].text
 
-    hint = parsed.get("hint", "")
-    next_step = parsed.get("next_step", "")
+        try:
+            # Extract JSON safely
+            json_match = re.search(r'\{.*\}', raw_text, re.DOTALL)
 
-except:
-    hint = "No hint generated"
-    next_step = "Try thinking about the next logical step."
+            if json_match:
+                parsed = json.loads(json_match.group())
+                hint = parsed.get("hint", "")
+                next_step = parsed.get("next_step", "")
+            else:
+                hint = raw_text
+                next_step = "Think about the next logical step."
+
+        except Exception as e:
+            print("Parsing error:", e)
+            hint = raw_text
+            next_step = ""
 
         # ==========================
         # 💾 SAVE CACHE
         # ==========================
         cache[cache_key] = {
             "value": {
-    "hint": hint,
-    "next_step": next_step
-}
+                "hint": hint,
+                "next_step": next_step
+            },
             "time": time.time()
         }
 
         return {
-    "hint": hint,
-    "next_step": next_step
-}
+            "hint": hint,
+            "next_step": next_step
+        }
 
     except Exception as e:
         import traceback
         print("ERROR:", e)
         traceback.print_exc()
-        return {"hint": f"Error: {str(e)}"}
+        return {
+            "hint": "Backend error",
+            "next_step": ""
+        }
 import uvicorn
-import re
-
-text = response.candidates[0].content.parts[0].text
-
-json_match = re.search(r'\{.*\}', text, re.DOTALL)
-
-if json_match:
-    parsed = json.loads(json_match.group())
-    hint = parsed.get("hint", "")
-    next_step = parsed.get("next_step", "")
-else:
-    hint = text
-    next_step = "Think about the next logical step."
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000)
