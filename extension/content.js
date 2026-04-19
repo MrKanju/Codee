@@ -172,7 +172,6 @@ async function handleHintClick() {
     const code = getCurrentCode();
     const { title, description } = getProblemData();
 
-    // Reset if code changed
     if (code !== lastCode) {
         hintLevel = 0;
         lastCode = code;
@@ -180,46 +179,48 @@ async function handleHintClick() {
 
     hintLevel++;
 
-    let hint = "";
+    const output = document.getElementById("hint-output");
 
-    // ✅ BEFORE CODING
+    // BEFORE CODING
     if (!code || code.trim().length === 0) {
-        hint = "Start by identifying the pattern in this problem.";
+        output.innerText = "Start by identifying the pattern.";
+        return;
     }
 
-    // 🔥 AFTER CODING → ALWAYS AI
-    else {
-        document.getElementById("hint-output").innerText = "Thinking...";
+    // SHOW LOADING
+    output.innerText = "⚡ Thinking...";
 
-        try {
-            const response = await fetch("https://codee-backend-nhux.onrender.com/hint", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    title,
-                    description,
-                    code,
-                    hint_level: hintLevel
-                })
-            });
+    try {
+        const response = await fetch("https://codee-backend-nhux.onrender.com/hint", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                title,
+                description,
+                code,
+                hint_level: hintLevel
+            })
+        });
 
-            const data = await response.json();
-            const hintText = data.hint || "";
-const nextStepText = data.next_step || "";
+        const data = await response.json();
 
-        } catch (error) {
-            console.log("Backend error:", error);
-            hint = "AI unavailable. Check backend.";
-        }
+        console.log("API RESPONSE:", data);
+
+        const hintText = data.hint || "No hint received";
+        const nextStepText = data.next_step || "";
+
+        output.innerHTML = `
+            <b>💡 Hint:</b> ${hintText}<br><br>
+            <b>➡️ Next Step:</b> ${nextStepText}
+        `;
+
+    } catch (error) {
+        console.log("ERROR:", error);
+        output.innerText = "⚠️ Backend error / timeout";
     }
-
-    document.getElementById("hint-output").innerHTML = `
-<b>💡 Hint:</b> ${hintText}<br><br>
-<b>➡️ Next Step:</b> ${nextStepText}
-`;
-}
+}ß
 
 // ==========================
 // 🎨 STYLES
