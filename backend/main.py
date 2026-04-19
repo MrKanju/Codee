@@ -103,23 +103,24 @@ Rules:
 - Level 2: clear direction
 - Level 3: almost full logic
 - Do NOT give full code
-- Keep it short
+- Keep each field SHORT (2–3 lines max)
 
-IMPORTANT:
-You MUST return BOTH fields.
+STRICT OUTPUT FORMAT:
 
-- "hint" (string)
-- "next_step" (string)
+Return ONLY valid JSON.
+NO explanations outside JSON.
+NO missing fields.
 
-DO NOT skip any field.
-DO NOT return partial JSON.
+ALWAYS include BOTH fields.
 
-Return EXACTLY this format:
+Example:
 
-{
-  "hint": "short hint",
-  "next_step": "what the user should try next"
-}
+{{
+  "hint": "Use two pointers instead of brute force.",
+  "next_step": "Try moving left and right pointers based on condition."
+}}
+
+Now generate response:
 """
 
         # ==========================
