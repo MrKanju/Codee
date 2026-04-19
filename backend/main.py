@@ -101,7 +101,15 @@ Rules:
 - Level 2: clear direction
 - Level 3: almost full logic
 - Do NOT give full code
-- Keep it short (2-3 lines)
+- Keep it short
+
+IMPORTANT:
+Return response in this EXACT JSON format:
+
+{{
+  "hint": "...",
+  "next_step": "..."
+}}
 """
 
         # ==========================
@@ -112,10 +120,18 @@ Rules:
             contents=prompt
         )
 
-        try:
-            hint = response.candidates[0].content.parts[0].text
-        except:
-            hint = "No hint generated"
+        import json
+
+try:
+    text = response.candidates[0].content.parts[0].text
+    parsed = json.loads(text)
+
+    hint = parsed.get("hint", "")
+    next_step = parsed.get("next_step", "")
+
+except:
+    hint = "No hint generated"
+    next_step = "Try thinking about the next logical step."
 
         # ==========================
         # 💾 SAVE CACHE
@@ -132,3 +148,7 @@ Rules:
         print("ERROR:", e)
         traceback.print_exc()
         return {"hint": f"Error: {str(e)}"}
+import uvicorn
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000)

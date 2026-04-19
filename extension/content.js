@@ -206,7 +206,8 @@ async function handleHintClick() {
             });
 
             const data = await response.json();
-            hint = data.hint;
+            const hintText = data.hint || "";
+const nextStepText = data.next_step || "";
 
         } catch (error) {
             console.log("Backend error:", error);
@@ -214,7 +215,10 @@ async function handleHintClick() {
         }
     }
 
-    document.getElementById("hint-output").innerText = hint;
+    document.getElementById("hint-output").innerHTML = `
+<b>💡 Hint:</b> ${hintText}<br><br>
+<b>➡️ Next Step:</b> ${nextStepText}
+`;
 }
 
 // ==========================
