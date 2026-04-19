@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "AI LeetCode Assistant",
+  "version": "1.0",
+  "description": "Adaptive hint system for coding problems",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["https://leetcode.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://leetcode.com/problems/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
