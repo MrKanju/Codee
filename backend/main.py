@@ -106,12 +106,20 @@ Rules:
 - Keep it short
 
 IMPORTANT:
-Return ONLY valid JSON.
+You MUST return BOTH fields.
 
-{{
-  "hint": "...",
-  "next_step": "..."
-}}
+- "hint" (string)
+- "next_step" (string)
+
+DO NOT skip any field.
+DO NOT return partial JSON.
+
+Return EXACTLY this format:
+
+{
+  "hint": "short hint",
+  "next_step": "what the user should try next"
+}
 """
 
         # ==========================
